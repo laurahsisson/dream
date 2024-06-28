@@ -23,7 +23,7 @@ class Encoder(torch.nn.Module):
                                          embedding_dim_edge_attr)
 
         dim_x, dim_edge_attr = embedding_dim_x, embedding_dim_edge_attr
-        self.convs = []
+        self.convs = torch.nn.ModuleList()
         for config in mpnn_configs:
             gnn = mpnn.from_config(config,
                                    node_in_feats=dim_x,
