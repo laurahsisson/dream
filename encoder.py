@@ -2,6 +2,7 @@ import torch
 import torch_geometric as tg
 import mpnn
 import embedding
+import utils
 
 
 class Encoder(torch.nn.Module):
@@ -57,7 +58,7 @@ class Encoder(torch.nn.Module):
 
     def count_parameters(self):
         return {
-            "total": count_parameters(self),
-            "convs": [count_parameters(conv) for conv in self.convs],
-            "readout": count_parameters(self.readout)
+            "total": utils.count_parameters(self),
+            "convs": [utils.count_parameters(conv) for conv in self.convs],
+            "readout": utils.count_parameters(self.readout)
         }
