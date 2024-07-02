@@ -4,6 +4,7 @@ import torch_geometric as tg
 class TwoStageAggregator(torch.nn.Module):
     def __init__(self, in_channels, heads, num_sabs, dropout):
         super(TwoStageAggregator, self).__init__()
+        self.in_channels = in_channels
         self.mol_readout = tg.nn.aggr.set_transformer.SetTransformerAggregation(
             in_channels,
             heads=heads,

@@ -24,7 +24,7 @@ def combine_graphs(graphs):
 def read_graph(graph_group: h5py._hl.group.Group):
     graph_data = {k: torch.tensor(np.array(v)) for k, v in graph_group.items()}
     graph_data = {k: v.long() if k in INDEX_KEYS else v.float() for k, v in graph_data.items()}
-    return tg.data.Data(**graph_data)
+    return BlendData(**graph_data)
 
 class PairData(tg.data.Data):
     def __inc__(self, key, value, *args, **kwargs):
