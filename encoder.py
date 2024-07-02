@@ -3,12 +3,13 @@ import torch_geometric as tg
 import mpnn
 import embedding
 import utils
+import aggregate
 
 
 class Encoder(torch.nn.Module):
 
     def __init__(self, graph_tokenizer, mpnn_configs, embedding_dim_x,
-                 embedding_dim_edge_attr, do_edge_update, num_sabs, heads,
+                 embedding_dim_edge_attr, do_edge_update, do_two_stage, num_sabs, heads,
                  dropout, **kwargs):
         super(Encoder, self).__init__()
 
@@ -34,11 +35,9 @@ class Encoder(torch.nn.Module):
             dim_x, dim_edge_attr = gnn.node_out_feats, gnn.edge_out_feats
             self.convs.append(gnn)
 
-        self.readout = tg.nn.aggr.set_transformer.SetTransformerAggregation(
-            dim_x,
+        self.readout = aggregate.BlendAggregator(do_two_stage,in_channels=dim_x,
             heads=heads,
-            num_encoder_blocks=num_sabs,
-            num_decoder_blocks=num_sabs,
+            num_sabs=num_sabs,
             dropout=dropout)
 
     # Cannot get gradient checkpointing to work b/c the SetTransformerAggregation
@@ -51,10 +50,7 @@ class Encoder(torch.nn.Module):
         for conv in self.convs:
             x, edge_attr = conv(graph, x, edge_attr)
 
-        if isinstance(graph, tg.data.Batch):
-            return self.readout(x, graph.batch)
-
-        return self.readout(x)
+        return self.readout(x, graph)
 
     def count_parameters(self):
         return {
