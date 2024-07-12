@@ -38,7 +38,7 @@ def make(pair_dataset,disable_tqdm=False,limit=None):
         tensor_keys = ["edge_index", 'edge_feat', 'node_feat']
         for key in tensor_keys:
             graph[key] = torch.from_numpy(graph[key])
-        return Data(x=graph["node_feat"].float(),edge_attr=graph["edge_feat"],edge_index=graph["edge_index"])
+        return Data(x=graph["node_feat"].float(),edge_attr=graph["edge_feat"].float(),edge_index=graph["edge_index"])
 
     errored = 0
     graph_data = dict()
