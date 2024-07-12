@@ -49,7 +49,7 @@ def make(pair_dataset,disable_tqdm=False,limit=None):
             errored += 1
 
     pair_to_data = dict()
-    for d in tqdm.tqdm(pair_dataset,smoothing=0,disable=disable_tqdm):
+    for i, d in enumerate(tqdm.tqdm(pair_dataset,smoothing=0,disable=disable_tqdm)):
         if not d["mol1"] in graph_data or not d["mol2"] in graph_data:
             continue
         pair = (d["mol1"],d["mol2"])
@@ -57,12 +57,12 @@ def make(pair_dataset,disable_tqdm=False,limit=None):
         g2 = graph_data[d["mol2"]]
         pair_to_data[pair] = data.combine_graphs([g1,g2])
         
-    valid_pairs = set(pair_to_data.keys()).intersection(set(all_multihots.keys()))
-
-    print("Combining dataset.")
-    dataset = []
-    for i, (pair, graph) in enumerate(pair_to_data.items()):
-        dataset.append({"pair":pair,"graph":graph,"notes":all_multihots[pair]})
         if limit and i > limit:
             break
+    valid_pairs = set(pair_to_data.keys()).intersection(set(all_multihots.keys()))
+
+    dataset = []
+    for (pair, graph) in pair_to_data.items():
+        dataset.append({"pair":pair,"graph":graph,"notes":all_multihots[pair]})
+
     return dataset
