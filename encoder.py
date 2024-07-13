@@ -9,8 +9,8 @@ import aggregate
 class Encoder(torch.nn.Module):
 
     def __init__(self, graph_tokenizer, mpnn_configs, embedding_dim_x,
-                 embedding_dim_edge_attr, do_edge_update, do_two_stage, num_sabs, heads,
-                 dropout, act_mode, aggr_mode, **kwargs):
+                 embedding_dim_edge_attr, do_edge_update, do_two_stage,
+                 num_sabs, heads, dropout, act_mode, aggr_mode, **kwargs):
         super(Encoder, self).__init__()
 
         use_embed = not graph_tokenizer is None
@@ -37,10 +37,11 @@ class Encoder(torch.nn.Module):
             dim_x, dim_edge_attr = gnn.node_out_feats, gnn.edge_out_feats
             self.convs.append(gnn)
 
-        self.readout = aggregate.BlendAggregator(do_two_stage,in_channels=dim_x,
-            heads=heads,
-            num_sabs=num_sabs,
-            dropout=dropout)
+        self.readout = aggregate.BlendAggregator(do_two_stage,
+                                                 in_channels=dim_x,
+                                                 heads=heads,
+                                                 num_sabs=num_sabs,
+                                                 dropout=dropout)
 
     # Cannot get gradient checkpointing to work b/c the SetTransformerAggregation
     # computes dropout internally and doesn't allow checkpointing.
@@ -60,4 +61,3 @@ class Encoder(torch.nn.Module):
             "convs": [utils.count_parameters(conv) for conv in self.convs],
             "readout": utils.count_parameters(self.readout)
         }
-

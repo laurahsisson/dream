@@ -1,5 +1,6 @@
 import torch
 
+
 def get_act_fn(act_mode):
     if act_mode == "relu":
         return torch.nn.ReLU

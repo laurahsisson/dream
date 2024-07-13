@@ -3,6 +3,7 @@ import torch_geometric as tg
 
 
 class VectorTokenizer:
+
     def __init__(self, unique_vector_tuples):
         self.unique_vector_tuples = unique_vector_tuples
         # Create a dictionary to map each vector to its index
@@ -14,7 +15,7 @@ class VectorTokenizer:
     def tokenize(self, vector):
         vector_tuple = tuple(vector.numpy())
         # Break on out of dictionary.
-        idx = self.vector_to_index.get(vector_tuple,len(vector_tuple))
+        idx = self.vector_to_index.get(vector_tuple, len(vector_tuple))
         return torch.tensor(idx, dtype=torch.long)
 
     def tokenize_batch(self, vectors):
