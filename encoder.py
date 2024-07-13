@@ -10,7 +10,7 @@ class Encoder(torch.nn.Module):
 
     def __init__(self, graph_tokenizer, mpnn_configs, embedding_dim_x,
                  embedding_dim_edge_attr, do_edge_update, do_two_stage, num_sabs, heads,
-                 dropout, **kwargs):
+                 dropout, act_mode, aggr_mode, **kwargs):
         super(Encoder, self).__init__()
 
         use_embed = not graph_tokenizer is None
@@ -22,7 +22,7 @@ class Encoder(torch.nn.Module):
 
         self.embed = embedding.Embedding(use_embed, unique_x, unique_edge_attr,
                                          embedding_dim_x,
-                                         embedding_dim_edge_attr)
+                                         embedding_dim_edge_attr, act_mode)
 
         dim_x, dim_edge_attr = embedding_dim_x, embedding_dim_edge_attr
         self.convs = torch.nn.ModuleList()
@@ -31,7 +31,9 @@ class Encoder(torch.nn.Module):
                                    node_in_feats=dim_x,
                                    edge_in_feats=dim_edge_attr,
                                    dropout=dropout,
-                                   do_edge_update=do_edge_update)
+                                   do_edge_update=do_edge_update,
+                                   act_mode=act_mode,
+                                   aggr_mode=aggr_mode)
             dim_x, dim_edge_attr = gnn.node_out_feats, gnn.edge_out_feats
             self.convs.append(gnn)
 
@@ -58,3 +60,4 @@ class Encoder(torch.nn.Module):
             "convs": [utils.count_parameters(conv) for conv in self.convs],
             "readout": utils.count_parameters(self.readout)
         }
+
