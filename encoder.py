@@ -44,9 +44,8 @@ class Encoder(torch.nn.Module):
                                                  dropout=dropout)
 
     # Cannot get gradient checkpointing to work b/c the SetTransformerAggregation
-    # computes dropout internally and doesn't allow checkpointing.
-    # We can't combine checkpointing and gradient checkpointing without causing issues.
-    # So we could commit to no dropout.
+    # computes dropout internally and doesn't allow checkpointing. So for now
+    # we will use dropout and no checkpointing.
     def forward(self, graph):
         x, edge_attr = self.embed(graph)
 
@@ -58,6 +57,7 @@ class Encoder(torch.nn.Module):
     def count_parameters(self):
         return {
             "total": utils.count_parameters(self),
+            "embed":utils.count_parameters(self.embed),
             "convs": [utils.count_parameters(conv) for conv in self.convs],
             "readout": utils.count_parameters(self.readout)
         }
