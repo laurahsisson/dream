@@ -2,7 +2,7 @@ import torch
 
 
 def count_parameters(module: torch.nn.Module):
-    return "{:,}".format(sum(p.numel() for p in module.parameters()))
+    return sum(p.numel() for p in module.parameters())
 
 
 def readout_counts(module: torch.nn.Module):
