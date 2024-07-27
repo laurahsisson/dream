@@ -1,5 +1,6 @@
 import encoder
 import activation
+import torch
 
 class Olfactor(torch.nn.Module):
     def __init__(self, encoder: encoder.Encoder, notes_dim: int, **kwargs):

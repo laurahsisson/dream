@@ -1,4 +1,6 @@
 import olfactor
+import activation
+import torch
 
 class CrossEncoder(torch.nn.Module):
     def __init__(self,olfactor:olfactor.Olfactor,representation_mode: str, cross_encoder_dim: int, act_mode: str, do_encoder_diff: bool,**kwargs):
@@ -18,7 +20,7 @@ class CrossEncoder(torch.nn.Module):
         else:
           combined_dim = 2*self.input_dim
 
-        act_fn = dream.activation.get_act_fn(act_mode)
+        act_fn = activation.get_act_fn(act_mode)
         if cross_encoder_dim > 0:
           self.readout = torch.nn.Sequential(torch.nn.Linear(combined_dim,cross_encoder_dim),act_fn(),
                                             torch.nn.Linear(cross_encoder_dim,1))

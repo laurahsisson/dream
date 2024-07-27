@@ -6,6 +6,7 @@ from torch_geometric.loader import DataLoader
 import numpy as np
 import data
 
+NOTES_DIM = 130
 
 def make(pair_dataset, disable_tqdm=False, limit=None):
     all_notes = set()
