@@ -3,7 +3,7 @@ import activation
 import torch
 
 class CrossEncoder(torch.nn.Module):
-    def __init__(self,olfactor:olfactor.Olfactor,representation_mode: str, cross_encoder_dim: int, act_mode: str, do_encoder_diff: bool, do_sigmoid: bool, cross_encoder_layers=1:int, **kwargs):
+    def __init__(self,olfactor:olfactor.Olfactor,representation_mode: str, cross_encoder_dim: int, act_mode: str, do_encoder_diff: bool, do_sigmoid: bool, cross_encoder_layers:int, **kwargs):
         super(CrossEncoder, self).__init__()
         self.olfactor = olfactor
         self.representation_mode = representation_mode
