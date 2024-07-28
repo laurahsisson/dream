@@ -1,6 +1,7 @@
 import olfactor
 import activation
 import torch
+import utils
 
 class CrossEncoder(torch.nn.Module):
     def __init__(self,olfactor:olfactor.Olfactor,representation_mode: str, cross_encoder_dim: int, act_mode: str, do_encoder_diff: bool, do_sigmoid: bool, cross_encoder_layers:int, **kwargs):
