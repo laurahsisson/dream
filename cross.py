@@ -3,7 +3,7 @@ import activation
 import torch
 
 class CrossEncoder(torch.nn.Module):
-    def __init__(self,olfactor:olfactor.Olfactor,representation_mode: str, cross_encoder_dim: int, act_mode: str, do_encoder_diff: bool,**kwargs):
+    def __init__(self,olfactor:olfactor.Olfactor,representation_mode: str, cross_encoder_dim: int, act_mode: str, do_encoder_diff: bool, do_sigmoid: bool, cross_encoder_layers=1:int, **kwargs):
         super(CrossEncoder, self).__init__()
         self.olfactor = olfactor
         self.representation_mode = representation_mode
@@ -21,11 +21,15 @@ class CrossEncoder(torch.nn.Module):
           combined_dim = 2*self.input_dim
 
         act_fn = activation.get_act_fn(act_mode)
+
+        self.readout = utils.build_layers(in_dim=combined_dim,hidden_dim=cross_encoder_dim,out_dim=1,act_fn=act_fn,num_hidden_layers=num_layers)
         if cross_encoder_dim > 0:
           self.readout = torch.nn.Sequential(torch.nn.Linear(combined_dim,cross_encoder_dim),act_fn(),
                                             torch.nn.Linear(cross_encoder_dim,1))
         else:
           self.readout = torch.nn.Linear(combined_dim,1)
+
+        self.do_sigmoid = self.do_sigmoid
 
     def get_representation(self,graph):
       olf = self.olfactor(graph)
@@ -43,4 +47,9 @@ class CrossEncoder(torch.nn.Module):
       else:
         x = torch.cat([repr1,repr2],dim=-1)
 
-      return self.readout(x).squeeze(dim=-1)
+      x = self.readout(x).squeeze(dim=-1)
+
+      if self.do_sigmoid:
+        return torch.nn.functional.sigmoid(x)
+      else:
+        return x
