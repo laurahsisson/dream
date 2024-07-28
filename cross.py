@@ -23,14 +23,13 @@ class CrossEncoder(torch.nn.Module):
 
         act_fn = activation.get_act_fn(act_mode)
 
+        self.do_sigmoid = self.do_sigmoid
         self.readout = utils.build_layers(in_dim=combined_dim,hidden_dim=cross_encoder_dim,out_dim=1,act_fn=act_fn,num_hidden_layers=cross_encoder_layers)
         if cross_encoder_dim > 0:
           self.readout = torch.nn.Sequential(torch.nn.Linear(combined_dim,cross_encoder_dim),act_fn(),
                                             torch.nn.Linear(cross_encoder_dim,1))
         else:
           self.readout = torch.nn.Linear(combined_dim,1)
-
-        self.do_sigmoid = self.do_sigmoid
 
     def get_representation(self,graph):
       olf = self.olfactor(graph)
