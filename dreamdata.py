@@ -1,6 +1,7 @@
 import h5py
 import data
 import torch
+import tqdm
 
 def load_dream_h5(fname):
     dream_data = []
