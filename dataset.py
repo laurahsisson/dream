@@ -5,6 +5,7 @@ from torch_geometric.data import InMemoryDataset, download_url, Data
 from torch_geometric.loader import DataLoader
 import numpy as np
 import data
+import h5py
 
 NOTES_DIM = 130
 
@@ -80,7 +81,7 @@ def make(pair_dataset, disable_tqdm=False, limit=None):
 def load_dream_h5(fname):
     dream_data = []
     with h5py.File(fname, 'r') as f:
-      for label in tqdm(f.keys()):
+      for label in tqdm.tqdm(f.keys()):
         group = f[label]
         graph1 = dream.data.read_graph(group['graph1'])
         graph2 = dream.data.read_graph(group['graph2'])
