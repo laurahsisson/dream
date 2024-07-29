@@ -10,8 +10,11 @@ def load_dream_h5(fname):
         group = f[label]
         graph1 = data.read_graph(group['graph1'])
         graph2 = data.read_graph(group['graph2'])
-        # Index using () for scalar dataset
-        y = group["y"][()]
         ds = group["dataset"][()]
-        dream_data.append({"graph1":graph1,"graph2":graph2,"y":torch.tensor(y),"dataset":ds.decode()})
+        # Index using () for scalar dataset
+        if "y" in group:
+            y = group["y"][()]
+            dream_data.append({"graph1":graph1,"graph2":graph2,"y":torch.tensor(y),"dataset":ds.decode()})
+        else:
+            dream_data.append({"graph1":graph1,"graph2":graph2,"dataset":ds.decode()})
     return dream_data
