@@ -18,7 +18,7 @@ def load_dream_h5(fname):
         entry = {"idx":int(idx),"label":label,"mixture1":mixture1,"mixture2":mixture2,"graph1":graph1,"graph2":graph2,"dataset":ds.decode()}
         if "y" in group:
             y = group["y"][()]
-            entry[y] = torch.tensor(y)
+            entry["y"] = torch.tensor(y)
         dream_data.append(entry)
 
     dream_data = sorted(dream_data,key=lambda d:d['idx'])
