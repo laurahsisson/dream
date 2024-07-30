@@ -13,11 +13,13 @@ def load_dream_h5(fname):
         # Index using () for scalar dataset
         ds = group["dataset"][()]
         label = group["label"][()]
+        mixture1 = group["mixture1"][()]
+        mixture2 = group["mixture2"][()]
+        data = {"idx":int(idx),"label":label,"mixture1":mixture1,"mixture2":mixture2,"graph1":graph1,"graph2":graph2,"dataset":ds.decode()}
         if "y" in group:
             y = group["y"][()]
-            dream_data.append({"idx":int(idx),"label":label,"graph1":graph1,"graph2":graph2,"y":torch.tensor(y),"dataset":ds.decode()})
-        else:
-            dream_data.append({"idx":int(idx),"label":label,"graph1":graph1,"graph2":graph2,"dataset":ds.decode()})
+            data[y] = torch.tensor(y)
+        dream_data.append(data)
 
     dream_data = sorted(dream_data,key=lambda d:d['idx'])
     return dream_data
