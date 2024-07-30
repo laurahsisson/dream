@@ -6,15 +6,18 @@ import tqdm
 def load_dream_h5(fname):
     dream_data = []
     with h5py.File(fname, 'r') as f:
-      for label in tqdm.tqdm(f.keys()):
-        group = f[label]
+      for idx in tqdm.tqdm(f.keys()):
+        group = f[idx]
         graph1 = data.read_graph(group['graph1'])
         graph2 = data.read_graph(group['graph2'])
-        ds = group["dataset"][()]
         # Index using () for scalar dataset
+        ds = group["dataset"][()]
+        label = group["label"][()]
         if "y" in group:
             y = group["y"][()]
-            dream_data.append({"label":label,"graph1":graph1,"graph2":graph2,"y":torch.tensor(y),"dataset":ds.decode()})
+            dream_data.append({"idx":int(idx),"label":label,"graph1":graph1,"graph2":graph2,"y":torch.tensor(y),"dataset":ds.decode()})
         else:
-            dream_data.append({"label":label,"graph1":graph1,"graph2":graph2,"dataset":ds.decode()})
+            dream_data.append({"idx":int(idx),"label":label,"graph1":graph1,"graph2":graph2,"dataset":ds.decode()})
+
+    dream_data = sorted(dream_data,key=lambda d:d['idx'])
     return dream_data
