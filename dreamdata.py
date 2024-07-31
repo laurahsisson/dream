@@ -14,11 +14,11 @@ def load_dream_h5(fname):
         group = f[idx]
         graph1 = data.read_graph(group['graph1'])
         graph2 = data.read_graph(group['graph2'])
-        ds = read_string(group,"dataset")
+        dataset = read_string(group,"dataset")
         label = read_string(group,"label")
         mixture1 = read_string(group,"mixture1")
         mixture2 = read_string(group,"mixture2")
-        entry = {"idx":int(idx),"label":label,"mixture1":mixture1,"mixture2":mixture2,"graph1":graph1,"graph2":graph2,"dataset":ds.decode()}
+        entry = {"idx":int(idx),"label":label,"mixture1":mixture1,"mixture2":mixture2,"graph1":graph1,"graph2":graph2,"dataset":dataset}
         if "y" in group:
             y = group["y"][()]
             entry["y"] = torch.tensor(y)
