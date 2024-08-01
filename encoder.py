@@ -57,7 +57,7 @@ class Encoder(torch.nn.Module):
     def count_parameters(self):
         return {
             "total": utils.count_parameters(self),
-            "embed":utils.count_parameters(self.embed),
+            "embed": utils.count_parameters(self.embed),
             "convs": [utils.count_parameters(conv) for conv in self.convs],
             "readout": utils.count_parameters(self.readout)
         }

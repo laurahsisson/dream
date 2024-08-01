@@ -8,6 +8,7 @@ import data
 
 NOTES_DIM = 130
 
+
 def make(pair_dataset, disable_tqdm=False, limit=None):
     all_notes = set()
     for d in pair_dataset:
