@@ -8,6 +8,10 @@ def read_string(group, key):
     # Index using () for scalar dataset
     return group[key][()].decode()
 
+def read_tensor(group, key):
+    # Index using () for scalar dataset
+    return torch.tensor(group[key][()])
+
 
 def load_dream_h5(fname):
     dream_data = []
@@ -28,10 +32,10 @@ def load_dream_h5(fname):
                 "graph1": graph1,
                 "graph2": graph2,
                 "dataset": dataset
+                "overlap": read_tensor(group, "overlap")
             }
             if "y" in group:
-                y = group["y"][()]
-                entry["y"] = torch.tensor(y)
+                entry["y"] = read_tensor(group, "y")
             dream_data.append(entry)
 
     dream_data = sorted(dream_data, key=lambda d: d['idx'])
