@@ -31,7 +31,7 @@ def load_dream_h5(fname):
                 "mixture2": mixture2,
                 "graph1": graph1,
                 "graph2": graph2,
-                "dataset": dataset
+                "dataset": dataset,
                 "overlap": read_tensor(group, "overlap")
             }
             if "y" in group:
