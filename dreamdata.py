@@ -10,7 +10,7 @@ def read_string(group, key):
 
 def read_tensor(group, key):
     # Index using () for scalar dataset
-    return torch.tensor(group[key][()])
+    return torch.tensor(group[key][()]).float()
 
 
 def load_dream_h5(fname):
