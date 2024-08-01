@@ -27,8 +27,6 @@ class CrossEncoder(torch.nn.Module):
 
         act_fn = activation.get_act_fn(act_mode)
 
-        combined_dim += 1
-
         self.do_sigmoid = do_sigmoid
         self.readout = utils.build_layers(
             in_dim=combined_dim,
