@@ -3,6 +3,13 @@ The goal of my approach was to pre-train and then transfer-learn a large graph n
 
 During pre-training, the GNN model would learn to embed molecules and predict the discrete labels for the aroma-chemical pairs, and as in “Expansive linguistic representations to predict interpretable odor mixture discriminability”, the notes and/or embeddings would be used as inputs to the similarity prediction model. Because of the limited time/compute, the hyperparameter tuning trials for pre-training and fine-tuning were conducted separately.
 
+## Repository Contents
+This repository contains:
+* `./`: The utilties and model components.
+* `Colab/`: The Google Colab notebooks used to tokenize, pre-train, fine-tune and submit the models.
+* `Notebooks/`: Various notebooks used to generate and explore the dataset, as well as test the models.
+* `Model/`: The Pytorch checkpoints for the pre-trained aroma-chemical pair prediction model, as well as the molecule tokenizing dictionary and the pre-training configuration/results.
+
 ## Architecture
 The GNN model used to embed graphs consisted of a molecule featurizer, a number of MPNN layers, and then a readout scheme. I used MPNN as the message passing function because it performed better than the GIN message passing function in my previous work. In the previous work, we used a single MPNN layer with 3 message passing steps, followed by a Set2Set readout function. Because of “Transfer learning with graph neural networks for improved molecular property prediction in the multi-fidelity setting”, I proceeded with a SetTransformer readout.
 
