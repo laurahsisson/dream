@@ -27,6 +27,8 @@ class CrossEncoder(torch.nn.Module):
 
         act_fn = activation.get_act_fn(act_mode)
 
+        combined_dim += 1
+
         self.do_sigmoid = do_sigmoid
         self.readout = utils.build_layers(
             in_dim=combined_dim,
@@ -41,6 +43,8 @@ class CrossEncoder(torch.nn.Module):
         else:
             self.readout = torch.nn.Linear(combined_dim, 1)
 
+        self.overlap = torch.nn.Linear(2, 1)
+
     def get_representation(self, graph):
         olf = self.olfactor(graph)
         if self.representation_mode == "embed":
@@ -49,9 +53,9 @@ class CrossEncoder(torch.nn.Module):
             return olf["logits"]
         return torch.cat([olf["embed"], olf["logits"]], dim=-1)
 
-    def forward(self, graph1, graph2):
-        repr1 = self.get_representation(graph1)
-        repr2 = self.get_representation(graph2)
+    def forward(self, blend):
+        repr1 = self.get_representation(blend["graph1"])
+        repr2 = self.get_representation(blend["graph2"])
         if self.do_encoder_diff:
             x = (repr1 - repr2).square()
         else:
@@ -59,7 +63,5 @@ class CrossEncoder(torch.nn.Module):
 
         x = self.readout(x).squeeze(dim=-1)
 
-        if self.do_sigmoid:
-            return torch.nn.functional.sigmoid(x)
-        else:
-            return x
+        pred = torch.nn.functional.sigmoid(x) if self.do_sigmoid else x
+        return self.overlap(torch.cat([pred,blend["overlap"]]))
