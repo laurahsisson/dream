@@ -35,9 +35,25 @@ While treating all atoms during readout as if they belong to a single graph work
 Regardless, the model chosen had 5 SetTransformer layers with 16 heads per layer. This is notably shorter and wider than the equivalent Transformer layers used in natural language processing.
 
 ### Featurization
-To featurize the molecules, I used the Open Graph Benchmark smiles2graph featurizer, which has 9 atom attributes (Atomic Number, Chirality, Degree, Formal Charge, #Hydrogens, #Radical Electrons, Hybridization, Aromaticity, Is In Ring) and 3 edge attributes (Bond Type, Bond Stereo, Conjugation). Because the total number of combinations of features for atoms and bonds is very small (73 and 11 respectively), I experimented with converting the featurized atoms and bonds into tokens and using an embedding dictionary. I think in further research this will prove quite productive, as projecting these features using linear weights does not take into account the radical difference between atoms/bonds that have even a single difference in their attributes.
+To featurize the molecules, I used the Open Graph Benchmark smiles2graph featurizer, which has 9 atom attributes (Atomic Number, Chirality, Degree, Formal Charge, #Hydrogens, #Radical Electrons, Hybridization, Aromaticity, Is In Ring) and 3 edge attributes (Bond Type, Bond Stereo, Conjugation).
 
-The hyperparameter tuning indeed showed this, and the best models usually included this tokenization scheme. After tokenization to 1-hot vectors, the 77 atom tokens were mapped to a 64 dimensional space, and the 11 edge tokens were mapped to 128 dimensional space. In the majority of trials, as with the convolutional layers, the edge dictionary had a larger hidden dimension than the atom dictionary.
+Out of 3.5k molecules across the pre-training and fine-tuning datasets, there were only 11 unique bond configurations.
+
+| Bond Type   | Bond Stereo       | Is Conjugated? |
+|-------------|-------------------|----------------|
+|SINGLE |STEREOZ | True|
+|UNSPECFIED |STEREONONE | False|
+|SINGLE |STEREONONE | False|
+|DOUBLE |STEREONONE | False|
+|UNSPECFIED |STEREONONE | True|
+|SINGLE |STEREONONE | True|
+|SINGLE |STEREOANY | False|
+|SINGLE |STEREOZ | False|
+|DOUBLE |STEREONONE | True|
+|TRIPLE |STEREONONE | True|
+|SINGLE |STEREOANY | True|
+
+Because the total number of combinations of features for atoms and bonds is very small (73 and 11 respectively), I experimented with converting the featurized atoms and bonds into tokens and using an embedding dictionary. I think in further research this will prove quite productive, as projecting these features using linear weights does not take into account the radical difference between atoms/bonds that have even a single difference in their attributes. The hyperparameter tuning indeed showed this, and the best models usually included this tokenization scheme. After tokenization to 1-hot vectors, the 77 atom tokens were mapped to a 64 dimensional space, and the 11 edge tokens were mapped to 128 dimensional space. In the majority of trials, as with the convolutional layers, the edge dictionary had a larger hidden dimension than the atom dictionary.
 
 ### Similarity Prediction
 For the similarity prediction task, the model took as input the concatenated blend embeddings and blend note-logits. I experimented with concatenating the inputs for each blend, but I found that subtracting the inputs from one blend to the other worked better. This input was passed through a multi-layer perceptron (hidden dim = 1024) with a sigmoid activation function to predict the blend similarity.
@@ -46,8 +62,7 @@ For the similarity prediction task, the model took as input the concatenated ble
 ### Pre-Training
 As noted above, the hyperparameter search was split between the pre-training and fine-tuning tasks. The 266k labeled pairs were split using an 80/20 random split. Notably, this dataset was not carved. In other words, though no pairs were shared between the train and test sets, there were molecules that appeared across both. This differs from the original aroma-chemical pair paper, but because the DREAM data also shared molecules across the train/leaderboard/test sets, I focused on evaluating the performance on unseen blends (with previously seen molecules).
 
-The training task was a multi-label classification task for the 130 notes. After 128 pre-training trials (Quasi Monte Carlo Sampler with Hyperband Pruning) for 150 epochs, models which achieved an AUROC above 0.70 were evaluated for fine-tuning.
-
+The training task was a multi-label classification task for the 130 notes. After 128 pre-training trials (Quasi Monte Carlo Sampler with Hyperband Pruning) for 150 epochs, models which achieved an AUROC above 0.70 were evaluated for fine-tuning
 
 ### Fine-Tuning
 To evaluate the performance of the fine-tuned models, I used a leave-one-dataset-out cross-validation scheme. In this scheme, each dataset had a fold where it was used as the test set to evaluate the performance of models trained on the other three sets combined. I used the average RMSE across the cross-validation trials. I attempted to use the class-imbalance between datasets as a weighting scheme for the MSE loss, but this was not helpful.
