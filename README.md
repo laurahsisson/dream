@@ -86,17 +86,15 @@ While an earlier model achieved a mean RMSE of 0.108 on this cross-validation sc
 As an additional regret, perhaps using the prior dataset carving scheme would have allowed me to discern which models actually transferred well to new data. While not carving the dataset allowed me to train on more pairs, it meant the evaluation task was significantly easier.
 
 ### Model Size
-The final model during pre-training had around 350k parameters, which is significantly larger than the models we trained during the paper, and likely one of the largest in the competition.
+The final model during pre-training had around 350k parameters, and while I think I had the data available to train such a large model, I did not have the compute and engineering time to optimize the architecture and training pipeline. Even a single hyperparameter pre-training trial took about 90 minutes. It would likely have been better to focus on a model in the range of 50k parameters, for which trials could be completed in less than half an hour. Still, this model was signficantly smaller than the original model in the aroma-chemical pair paper, which could have led to lower transfer-learning performance.
 
-| Component | Parameters |
-| --------- | ---------- |
-| Embedding | 6,272      |
-| MPNGNN    | 108,184    |
-| Readout   | 233,024    |
-| Total     | 347,480    |
+| Component | Dream Model | Paper Model   |
+| --------- | ----------- | ------------- |
+| Embedding | 6,272       | *N/A*         |
+| MPNGNN    | 108,184     | 834,725       |
+| Readout   | 233,024     | 803,200       |
+| **Total** | **347,480** | **1,637,925** |
 
-
-It was exciting to train such a large model, and while I think I had the data available to train such a large model, I did not have the compute and engineering time to optimize the architecture and training pipeline. Even a single hyperparameter pre-training trial took about 90 minutes. It would likely have been better to focus on a model in the range of 50k parameters, for which trials could be completed in less than half an hour.
 
 ## Environmental Cost
 Experiments were conducted using Google Cloud Platform in region us-east1, which has a carbon efficiency of 0.37 kgCO2/kWh. A cumulative of 234 hours of computation was performed on hardware of type A100 PCIe 40 (TDP of 250W) through Google Colab.
