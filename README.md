@@ -91,9 +91,10 @@ The final model during pre-training had around 350k parameters, and while I thin
 | Component | Dream Model | Paper Model   |
 | --------- | ----------- | ------------- |
 | Embedding | 6,272       | *N/A*         |
-| MPNGNN    | 108,184     | 834,725       |
+| MPN       | 108,184     | 834,725       |
 | Readout   | 233,024     | 803,200       |
-| **Total** | **347,480** | **1,637,925** |
+| Classifier| 8,450       | 147,988       |
+| **Total** | **355,930** | **1,785,913** |
 
 
 ## Environmental Cost
