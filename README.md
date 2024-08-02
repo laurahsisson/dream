@@ -48,8 +48,14 @@ As noted above, the hyperparameter search was split between the pre-training and
 
 The training task was a multi-label classification task for the 130 notes. After 128 pre-training trials (Quasi Monte Carlo Sampler with Hyperband Pruning) for 150 epochs, models which achieved an AUROC above 0.70 were evaluated for fine-tuning.
 
+
 ### Fine-Tuning
 To evaluate the performance of the fine-tuned models, I used a leave-one-dataset-out cross-validation scheme. In this scheme, each dataset had a fold where it was used as the test set to evaluate the performance of models trained on the other three sets combined. I used the average RMSE across the cross-validation trials. I attempted to use the class-imbalance between datasets as a weighting scheme for the MSE loss, but this was not helpful.
+
+
+![Snitz 2](https://github.com/user-attachments/assets/3ac6eed2-9398-48e8-b739-27d7e2a25c0b)
+
+<sup>**Figure 1:** RMSE for the left-out test fold by training epochs. Dotted vertical line indicates the peak learning rate point for slanted triangular learning rates. Left: RMSE by Fold, for each of the cross-validation folds. Right: Median and Mean RMSE over epochs.</sup>
 
 Although I attempted to use a variety of fine-tuning hyperparameter searches, the best models from these searches did not transfer well to the leaderboard set. As a result, I did a fair bit of manual hyperparameter tuning, choosing the best performing model from pre-training as the base model.
 
@@ -81,6 +87,14 @@ As an additional regret, perhaps using the prior dataset carving scheme would ha
 
 ### Model Size
 The final model during pre-training had around 350k parameters, which is significantly larger than the models we trained during the paper, and likely one of the largest in the competition.
+
+| Component | Parameters |
+| --------- | ---------- |
+| Embedding | 6,272      |
+| MPNGNN    | 108,184    |
+| Readout   | 233,024    |
+| Total     | 347,480    |
+
 
 It was exciting to train such a large model, and while I think I had the data available to train such a large model, I did not have the compute and engineering time to optimize the architecture and training pipeline. Even a single hyperparameter pre-training trial took about 90 minutes. It would likely have been better to focus on a model in the range of 50k parameters, for which trials could be completed in less than half an hour.
 
