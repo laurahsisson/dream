@@ -9,11 +9,12 @@ import data
 NOTES_DIM = 130
 
 
-def make(pair_dataset, disable_tqdm=False, limit=None):
-    all_notes = set()
-    for d in pair_dataset:
-        all_notes.update(d["blend_notes"])
-    all_notes = list(all_notes)
+def make(pair_dataset, all_notes=None,  disable_tqdm=False, limit=None):
+    if all_notes is None:
+        all_notes = set()
+        for d in pair_dataset:
+            all_notes.update(d["blend_notes"])
+        all_notes = list(all_notes)
 
     # Create a dictionary mapping each label to a unique index
     label_to_index = {label: idx for idx, label in enumerate(all_notes)}
