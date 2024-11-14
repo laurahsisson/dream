@@ -25,6 +25,8 @@ def make(pair_dataset, all_notes=None,  disable_tqdm=False, limit=None):
 
         # Set the corresponding positions in the tensor to 1 for each label of the item
         for label in notes:
+            if not label in label_to_index:
+                continue
             index = label_to_index[label]
             multi_hot_vector[index] = 1
         return multi_hot_vector
