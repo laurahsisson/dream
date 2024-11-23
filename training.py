@@ -7,6 +7,7 @@ import numpy as np
 import dream.gcn
 import dream.utils
 import torch_geometric as pyg
+import torch
 
 def predict(graph_model,batch):
     batch = {k:v.cuda() for k, v in batch.items() if k!= "pair"}
