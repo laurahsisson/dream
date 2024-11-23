@@ -60,8 +60,8 @@ def train_model(graph_model, config, train_dataset, test_dataset):
 
   graph_model = dream.gcn.GCN(**config)
   model_size = dream.utils.count_parameters(graph_model)
-  assert model_size <= MAX_SIZE
-  assert model_size >= MIN_SIZE
+  assert model_size <= config["max_size"]
+  assert model_size >= config["min_size"]
 
   graph_model.cuda()
   print(f"Trial ID = {config['trial_id']}",f"Model Size = {model_size:,}",config,sep="\n")
