@@ -9,7 +9,7 @@ import data
 NOTES_DIM = 130
 
 
-def make(pair_dataset, all_notes=None,  disable_tqdm=False, limit=None):
+def make(pair_dataset, all_notes=None, disable_tqdm=False, limit=None):
     if all_notes is None:
         all_notes = set()
         for d in pair_dataset:

@@ -4,8 +4,12 @@ import utils
 import activation
 import aggregate
 
+
 class GCN(torch.nn.Module):
-    def __init__(self, in_features, num_convs, num_mpnns, num_hidden_layers, hidden_dim, dropout, do_two_stage, num_heads, num_sabs, notes_dim, act_mode, **kwargs):
+
+    def __init__(self, in_features, num_convs, num_mpnns, num_hidden_layers,
+                 hidden_dim, dropout, do_two_stage, num_heads, num_sabs,
+                 notes_dim, act_mode, **kwargs):
         """
         Initializes the GCN model.
 
@@ -28,23 +32,19 @@ class GCN(torch.nn.Module):
 
         # Initial projection of node features to hidden dimension
         self.project_node_feats = torch.nn.Sequential(
-            torch.nn.Linear(in_features, hidden_dim),
-            self.act_fn(),
-            torch.nn.Dropout(dropout)
-        )
+            torch.nn.Linear(in_features, hidden_dim), self.act_fn(),
+            torch.nn.Dropout(dropout))
 
         # GNN layers with hidden state normalization
         self.convs = torch.nn.ModuleList()
         self.norms = torch.nn.ModuleList()
         for _ in range(num_mpnns):
             # Build the MLP for GINConv
-            nn = utils.build_layers(
-                in_dim=hidden_dim,
-                hidden_dim=hidden_dim,
-                out_dim=hidden_dim,
-                act_fn=self.act_fn,
-                num_hidden_layers=num_hidden_layers
-            )
+            nn = utils.build_layers(in_dim=hidden_dim,
+                                    hidden_dim=hidden_dim,
+                                    out_dim=hidden_dim,
+                                    act_fn=self.act_fn,
+                                    num_hidden_layers=num_hidden_layers)
             # Graph convolution layer (GINConv) with MLP
             self.convs.append(pyg.nn.GINConv(nn))
             # Add normalization layer for hidden states
@@ -54,10 +54,10 @@ class GCN(torch.nn.Module):
 
         # Readout layer
         self.readout = aggregate.BlendAggregator(do_two_stage,
-                                                        in_channels=hidden_dim,
-                                                        heads=num_heads,
-                                                        num_sabs=num_sabs,
-                                                        dropout=dropout)
+                                                 in_channels=hidden_dim,
+                                                 heads=num_heads,
+                                                 num_sabs=num_sabs,
+                                                 dropout=dropout)
 
         # Linear layer for note prediction
         self.notes_predictor = torch.nn.Linear(hidden_dim, notes_dim)
@@ -83,21 +83,19 @@ class GCN(torch.nn.Module):
         for conv, norm in zip(self.convs, self.norms):
             for _ in range(self.num_convs):
                 x = conv(x, graph.edge_index)  # GINConv
-                x = norm(x)                   # Hidden state normalization
-                x = self.act_fn()(x)          # Activation
-                x = self.dropout(x)           # Dropout after activation
-            x = x + residual                  # Add residual connection
-            residual = x                      # Update residual for next block
+                x = norm(x)  # Hidden state normalization
+                x = self.act_fn()(x)  # Activation
+                x = self.dropout(x)  # Dropout after activation
+            x = x + residual  # Add residual connection
+            residual = x  # Update residual for next block
 
         # Save the embedding
         x = self.readout(x, graph)
-        embedding = x.clone()  # Clone to ensure isolation from further modifications
+        embedding = x.clone(
+        )  # Clone to ensure isolation from further modifications
 
         # Predict notes using the final embedding
         predictions = self.notes_predictor(x)
 
         # Return both the embeddings and predictions
-        return {
-            "embed": embedding,
-            "logits": predictions
-        }
+        return {"embed": embedding, "logits": predictions}

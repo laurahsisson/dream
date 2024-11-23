@@ -62,4 +62,4 @@ class CrossEncoder(torch.nn.Module):
         x = self.readout(x)
         pred = torch.nn.functional.sigmoid(x) if self.do_sigmoid else x
         blend = blend["overlap"].unsqueeze(-1)
-        return self.overlap(torch.cat([pred,blend],dim=-1)).squeeze()
+        return self.overlap(torch.cat([pred, blend], dim=-1)).squeeze()

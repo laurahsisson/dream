@@ -8,6 +8,7 @@ def read_string(group, key):
     # Index using () for scalar dataset
     return group[key][()].decode()
 
+
 def read_tensor(group, key):
     # Index using () for scalar dataset
     return torch.tensor(group[key][()]).float()
