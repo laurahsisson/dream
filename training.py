@@ -30,12 +30,12 @@ def do_train_step(optimizer, scheduler, graph_model, batch):
 
     return to_np(loss)
 
-def calc_test_metrics(graph_model, loader, notes_dim):
+def calc_test_metrics(graph_model, config, loader):
     tls = []
     # For per-note AUROC
-    auroc_metric_per_note = torchmetrics.classification.MultilabelAUROC(notes_dim, average=None)
+    auroc_metric_per_note = torchmetrics.classification.MultilabelAUROC(config["notes_dim"], average=None)
     # For micro-average AUROC
-    auroc_metric_micro = torchmetrics.classification.MultilabelAUROC(notes_dim, average='micro')
+    auroc_metric_micro = torchmetrics.classification.MultilabelAUROC(config["notes_dim"], average='micro')
 
     with torch.no_grad():
         for batch in loader:
@@ -53,7 +53,7 @@ def calc_test_metrics(graph_model, loader, notes_dim):
     return {
         "auroc": auroc_micro,  # Micro-average AUROC
         "loss": np.mean(tls),
-        "auroc_per_note": dict(zip(ALL_NOTES,auroc_per_note))
+        "auroc_per_note": dict(zip(config["covered_notes"],auroc_per_note))
     }
 
 def train_model(graph_model, config, train_dataset, test_dataset):
@@ -80,7 +80,7 @@ def train_model(graph_model, config, train_dataset, test_dataset):
   test_aurocs = []
   train_losses = []
 
-  test_metrics = calc_test_metrics(graph_model,test_loader, config["notes_dim"])
+  test_metrics = calc_test_metrics(graph_model, config, loader)
 
   with tqdm(total=total_steps,smoothing=0) as pbar:
       for epoch in range(config["epochs"]):
@@ -99,7 +99,7 @@ def train_model(graph_model, config, train_dataset, test_dataset):
 
         # Evaluate graph_model on training data
         graph_model.eval()
-        test_metrics = calc_test_metrics(graph_model,test_loader, config["notes_dim"])
+        test_metrics = calc_test_metrics(graph_model, config, loader)
         print(epoch, test_metrics)
         print("NOTES:",len([k for k,v in test_metrics["auroc_per_note"].items() if v > .5]))
         test_losses.append(test_metrics["loss"].item())
