@@ -73,7 +73,7 @@ def make(pair_dataset,
 
     pair_to_data = dict()
     for i, d in enumerate(
-            tqdm.tqdm(pair_dataset, smoothing=0, disable=disable_tqdm)):
+            tqdm(pair_dataset, smoothing=0, disable=disable_tqdm)):
         if not d["mol1"] in graph_data or not d["mol2"] in graph_data:
             continue
         pair = (d["mol1"], d["mol2"])
