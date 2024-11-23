@@ -62,6 +62,18 @@ class GCN(torch.nn.Module):
         # Linear layer for note prediction
         self.notes_predictor = torch.nn.Linear(hidden_dim, notes_dim)
 
+    def do_conv(self, conv_idx, x, residual, graph):
+        conv, norm = self.convs[conv_idx], self.norms[conv_idx]
+        for _ in range(self.num_convs):
+            x = conv(x, graph.edge_index)  # GINConv
+            x = norm(x)  # Hidden state normalization
+            x = self.act_fn()(x)  # Activation
+            x = self.dropout(x)  # Dropout after activation
+        x = x + residual  # Add residual connection
+        residual = x  # Update residual for next block
+
+        return x, residual
+
     def forward(self, graph):
         """
         Defines the forward pass of the GCN.
@@ -72,6 +84,7 @@ class GCN(torch.nn.Module):
         Returns:
             dict: Contains 'embed' (node embeddings) and 'logits' (note predictions).
         """
+
         # Feature normalization
         x = self.feature_norm(graph.x)
 
@@ -80,14 +93,8 @@ class GCN(torch.nn.Module):
 
         # Residual connections and graph convolutions
         residual = x
-        for conv, norm in zip(self.convs, self.norms):
-            for _ in range(self.num_convs):
-                x = conv(x, graph.edge_index)  # GINConv
-                x = norm(x)  # Hidden state normalization
-                x = self.act_fn()(x)  # Activation
-                x = self.dropout(x)  # Dropout after activation
-            x = x + residual  # Add residual connection
-            residual = x  # Update residual for next block
+        for conv_inx in range(len(self.convs)):
+            x, residual = self.do_conv(conv_idx, x, residual, graph)
 
         # Save the embedding
         x = self.readout(x, graph)
