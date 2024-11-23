@@ -33,9 +33,9 @@ def do_train_step(optimizer, scheduler, graph_model, batch):
 def calc_test_metrics(graph_model, loader):
     tls = []
     # For per-note AUROC
-    auroc_metric_per_note = torchmetrics.classification.MultilabelAUROC(NOTES_DIM, average=None)
+    auroc_metric_per_note = torchmetrics.classification.MultilabelAUROC(config["notes_dim"], average=None)
     # For micro-average AUROC
-    auroc_metric_micro = torchmetrics.classification.MultilabelAUROC(NOTES_DIM, average='micro')
+    auroc_metric_micro = torchmetrics.classification.MultilabelAUROC(config["notes_dim"], average='micro')
 
     with torch.no_grad():
         for batch in loader:
