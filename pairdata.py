@@ -15,8 +15,13 @@ def to_torch(graph):
                 edge_attr=graph["edge_feat"].float(),
                 edge_index=graph["edge_index"])
 
+def convert(datapoint):
+    return {"mol1":datapoint["edge"][0],"mol2":datapoint["edge"][1],"blend_notes":datapoint["blend_notes"]}
 
-def make(pair_dataset, all_notes=None, disable_tqdm=False, limit=None):
+def make(pair_dataset, all_notes=None, convert_first=False, disable_tqdm=False, limit=None):
+    if convert_first:
+        pair_dataset = [convert(d) for d in pair_dataset]
+
     if all_notes is None:
         all_notes = set()
         for d in pair_dataset:
