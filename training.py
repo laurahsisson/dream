@@ -105,5 +105,3 @@ def train_model(graph_model, config, train_dataset, test_dataset):
         test_aurocs.append(test_metrics["auroc"].item())
 
   return graph_model, max(test_aurocs)
-
-graph_model, best_auroc = train_model(config)
