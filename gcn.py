@@ -93,7 +93,7 @@ class GCN(torch.nn.Module):
 
         # Residual connections and graph convolutions
         residual = x
-        for conv_inx in range(len(self.convs)):
+        for conv_idx in range(len(self.convs)):
             x, residual = self.do_conv(conv_idx, x, residual, graph)
 
         # Save the embedding
