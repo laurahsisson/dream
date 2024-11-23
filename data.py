@@ -7,7 +7,6 @@ INDEX_KEYS = {"edge_index", "mol_batch", "blend_batch"}
 
 
 class BlendData(tg.data.Data):
-
     def __inc__(self, key, value, *args, **kwargs):
         # Used for indexing the molecule into each batch
         # Each blend has only 1 blend (by definition)
@@ -28,6 +27,34 @@ def combine_graphs(graphs):
                      edge_index=combined_batch.edge_index,
                      mol_batch=mol_batch,
                      blend_batch=blend_batch)
+
+def combine_graphs_fast(graphs):
+    # Start with empty tensors for concatenation
+    x_list, edge_index_list, edge_attr_list = [], [], []
+    mol_batch_list = []
+    current_node_index = 0
+
+    for i, graph in enumerate(graphs):
+        x_list.append(graph.x)
+        edge_attr_list.append(graph.edge_attr)
+        edge_index_list.append(graph.edge_index + current_node_index)
+        
+        # `mol_batch` needs to mark the molecule index for each node
+        mol_batch_list.append(torch.full((graph.x.size(0),), i, dtype=torch.long))
+
+        # Update node index offset for the next graph
+        current_node_index += graph.x.size(0)
+
+    # Concatenate all lists into single tensors
+    x = torch.cat(x_list, dim=0)
+    edge_attr = torch.cat(edge_attr_list, dim=0)
+    edge_index = torch.cat(edge_index_list, dim=1)
+    mol_batch = torch.cat(mol_batch_list, dim=0)
+    
+    # Create a blend_batch tensor of zeros for each node
+    blend_batch = torch.zeros(len(graphs), dtype=torch.long)
+
+    return BlendData(x=x, edge_attr=edge_attr, edge_index=edge_index, mol_batch=mol_batch, blend_batch=blend_batch)
 
 
 def read_graph(graph_group: h5py._hl.group.Group):

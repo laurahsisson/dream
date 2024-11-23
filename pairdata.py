@@ -23,7 +23,6 @@ def convert(datapoint):
         "blend_notes": datapoint["blend_notes"]
     }
 
-
 def make(pair_dataset,
          all_notes=None,
          convert_first=False,
