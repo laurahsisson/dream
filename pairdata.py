@@ -6,6 +6,7 @@ from torch_geometric.loader import DataLoader
 import numpy as np
 import data
 
+
 def to_torch(graph):
     tensor_keys = ["edge_index", 'edge_feat', 'node_feat']
     for key in tensor_keys:
@@ -13,6 +14,7 @@ def to_torch(graph):
     return Data(x=graph["node_feat"].float(),
                 edge_attr=graph["edge_feat"].float(),
                 edge_index=graph["edge_index"])
+
 
 def make(pair_dataset, all_notes=None, disable_tqdm=False, limit=None):
     if all_notes is None:
@@ -44,8 +46,6 @@ def make(pair_dataset, all_notes=None, disable_tqdm=False, limit=None):
     for d in pair_dataset:
         all_smiles.add(d["mol1"])
         all_smiles.add(d["mol2"])
-
-
 
     errored = 0
     graph_data = dict()
