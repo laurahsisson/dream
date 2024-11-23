@@ -14,21 +14,7 @@ class BlendData(tg.data.Data):
             return 1
         return super().__inc__(key, value, *args, **kwargs)
 
-
 def combine_graphs(graphs):
-    combined_batch = next(
-        iter(tg.loader.DataLoader(graphs, batch_size=len(graphs))))
-    # Index of the molecule, for each atom
-    mol_batch = combined_batch.batch
-    # Index of the blend, for each molecule (increment during batch)
-    blend_batch = torch.zeros(len(graphs), dtype=torch.long)
-    return BlendData(x=combined_batch.x,
-                     edge_attr=combined_batch.edge_attr,
-                     edge_index=combined_batch.edge_index,
-                     mol_batch=mol_batch,
-                     blend_batch=blend_batch)
-
-def combine_graphs_fast(graphs):
     # Start with empty tensors for concatenation
     x_list, edge_index_list, edge_attr_list = [], [], []
     mol_batch_list = []
