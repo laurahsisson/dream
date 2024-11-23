@@ -54,6 +54,7 @@ def make(pair_dataset, all_notes=None,  disable_tqdm=False, limit=None):
         try:
             graph_data[smiles] = to_torch(smiles2graph(smiles))
         except AttributeError as e:
+            print(e)
             errored += 1
 
     pair_to_data = dict()
@@ -66,8 +67,6 @@ def make(pair_dataset, all_notes=None,  disable_tqdm=False, limit=None):
         g2 = graph_data[d["mol2"]]
         pair_to_data[pair] = data.combine_graphs([g1, g2])
 
-        if limit and i > limit:
-            break
     valid_pairs = set(pair_to_data.keys()).intersection(
         set(all_multihots.keys()))
 
