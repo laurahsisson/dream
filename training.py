@@ -84,8 +84,7 @@ def train_model(graph_model, config, train_dataset, test_dataset, trial=None):
 
     start = time.perf_counter()
 
-    graph_model = dream.gcn.GCN(**config)
-    model_size = dream.utils.count_parameters(graph_model)
+    model_size = utils.count_parameters(graph_model)
 
     print(f"Trial ID = {config['trial_id']}",
           f"Model Size = {model_size:,}",
@@ -111,7 +110,7 @@ def train_model(graph_model, config, train_dataset, test_dataset, trial=None):
                                   betas=config["betas"])
 
     total_steps = config["epochs"] * len(train_loader)
-    scheduler = dream.utils.make_scheduler(optimizer, config["warmup"],
+    scheduler = utils.make_scheduler(optimizer, config["warmup"],
                                            total_steps)
 
     step = 0
