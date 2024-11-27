@@ -18,28 +18,6 @@ class BlendData(tg.data.Data):
 # Specifically for loading ordered pairs of molecules, primarily
 # for use in similarity prediction.
 class PairData(tg.data.Data):
-    def __init__(self, data_s, data_t, y=None):
-        """
-        Initialize a BlendData object from two source graphs and optionally a label.
-
-        Args:
-            data_s (torch_geometric.data.Data): Source graph with arbitrary attributes.
-            data_t (torch_geometric.data.Data): Target graph with arbitrary attributes.
-            y (optional, torch.Tensor): Label or target value for the pair.
-        """
-        super().__init__()
-        
-        # Set attributes for source graph with `_s` suffix
-        for key, value in data_s.items():
-            setattr(self, f"{key}_s", value)
-        
-        # Set attributes for target graph with `_t` suffix
-        for key, value in data_t.items():
-            setattr(self, f"{key}_t", value)
-        
-        # Optionally set the label
-        self.y = y
-
     def __inc__(self, key, value, *args, **kwargs):
         # Adjust increments for edge indices to handle source and target separately
         if key == 'edge_index_s':
@@ -79,6 +57,34 @@ class PairData(tg.data.Data):
                 graph_data[attr[:-2]] = value  # Remove the suffix (_s or _t)
 
         return tg.data.Data(**graph_data)
+
+    @classmethod
+    def create_blend_data(cls, data_s, data_t, y=None):
+        """
+        Factory function to create a BlendData object from two source graphs and optionally a label.
+
+        Args:
+            data_s (torch_geometric.data.Data): Source graph with arbitrary attributes.
+            data_t (torch_geometric.data.Data): Target graph with arbitrary attributes.
+            y (optional, torch.Tensor): Label or target value for the pair.
+
+        Returns:
+            BlendData: A BlendData object containing all attributes from the source and target graphs.
+        """
+        blend_data = cls()
+        
+        # Set attributes for source graph with `_s` suffix
+        for key, value in data_s.items():
+            setattr(blend_data, f"{key}_s", value)
+        
+        # Set attributes for target graph with `_t` suffix
+        for key, value in data_t.items():
+            setattr(blend_data, f"{key}_t", value)
+        
+        # Optionally set the label
+        blend_data.y = y
+        
+        return blend_data
 
     @classmethod
     def _make_batches(cls, pair_graph):
