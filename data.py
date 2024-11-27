@@ -59,7 +59,7 @@ class PairData(tg.data.Data):
         return tg.data.Data(**graph_data)
 
     @classmethod
-    def create_blend_data(cls, data_s, data_t, y=None):
+    def factory(cls, data_s, data_t, y=None):
         """
         Factory function to create a BlendData object from two source graphs and optionally a label.
 
