@@ -87,18 +87,12 @@ class PairData(tg.data.Data):
         return blend_data
 
     @classmethod
-    def _make_batches(cls, pair_graph):
-        raise NotImplementedError("Use get_graph(key)") 
-
-    @classmethod
-    def _make_data(cls, pair_graph):
-        raise NotImplementedError("Use get_graph(key)") 
-
-    @classmethod
     def split(cls, pair_graph):
         graph_s = pair_graph._get_graph("s") 
         graph_t = pair_graph._get_graph("t")
         if isinstance(pair_graph, tg.data.Batch):
+            graph_s["batch"] = pair_graph["x_s_batch"]
+            graph_t["batch"] = pair_graph["x_t_batch"]
             return tg.data.Batch(**graph_s), tg.data.Batch(**graph_t)
         else:
             return tg.data.Data(**graph_s), tg.data.Data(**graph_t)
