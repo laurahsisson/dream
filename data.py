@@ -78,7 +78,7 @@ class PairData(tg.data.Data):
             if attr.endswith(suffix):
                 graph_data[attr[:-2]] = value  # Remove the suffix (_s or _t)
 
-        return Data(**graph_data)
+        return tg.data.Data(**graph_data)
 
     @classmethod
     def _make_batches(cls, pair_graph):
@@ -93,7 +93,7 @@ class PairData(tg.data.Data):
         raise NotImplementedError("Use get_graph(key)") 
 
 
-# TODO: Refactor into BlendData
+# TODO: Refactor into Blendtg.data.Data
 def combine_graphs(graphs):
     # Start with empty tensors for concatenation
     x_list, edge_index_list, edge_attr_list = [], [], []
