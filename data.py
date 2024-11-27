@@ -104,7 +104,7 @@ class PairData(tg.data.Data):
             return tg.data.Data(**graph_s), tg.data.Data(**graph_t)
 
 
-# TODO: Refactor into Blendtg.data.Data
+# TODO: Refactor into BlendData
 def combine_graphs(graphs):
     # Start with empty tensors for concatenation
     x_list, edge_index_list, edge_attr_list = [], [], []
