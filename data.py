@@ -34,7 +34,7 @@ class PairData(tg.data.Data):
             return None  # Avoid concatenation for y
         return super().__cat_dim__(key, value, *args, **kwargs)
 
-    def get_graph(self, key):
+    def _get_graph(self, key):
         """
         Retrieve a source or target graph as a Data object.
 
@@ -56,7 +56,7 @@ class PairData(tg.data.Data):
             if attr.endswith(suffix):
                 graph_data[attr[:-2]] = value  # Remove the suffix (_s or _t)
 
-        return tg.data.Data(**graph_data)
+        return graph_data
 
     @classmethod
     def factory(cls, data_s, data_t, y=None):
@@ -96,7 +96,12 @@ class PairData(tg.data.Data):
 
     @classmethod
     def split(cls, pair_graph):
-        raise NotImplementedError("Use get_graph(key)") 
+        graph_s = pair_graph._get_graph("s"), 
+        graph_t = pair_graph._get_graph("t")
+        if isinstance(pair_graph, tg.data.Batch):
+            return tg.data.Batch(**graph_s), tg.data.Batch(**graph_t)
+        else:
+            return tg.data.Data(**graph_s), tg.data.Data(**graph_t)
 
 
 # TODO: Refactor into Blendtg.data.Data
