@@ -1,7 +1,8 @@
 import os
 import torch
 import numpy
-
+import json
+import numpy as np
 
 def make_serializable(data):
     if isinstance(data, np.ndarray):
@@ -20,10 +21,10 @@ def make_serializable(data):
     return data  # Return as is for other supported types
 
 
-def save(path):
+def save(path,ckpt,model):
     os.makedirs(path, exist_ok=True)
 
     with open(os.path.join(path, "config.json"), "w") as f:
-        json.dump(make_ckpt_data(), f)
+        json.dump(ckpt, f)
 
     torch.save(model.state_dict(), os.path.join(path, "model.pt"))
