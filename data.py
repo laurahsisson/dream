@@ -96,7 +96,7 @@ class PairData(tg.data.Data):
 
     @classmethod
     def split(cls, pair_graph):
-        graph_s = pair_graph._get_graph("s"), 
+        graph_s = pair_graph._get_graph("s") 
         graph_t = pair_graph._get_graph("t")
         if isinstance(pair_graph, tg.data.Batch):
             return tg.data.Batch(**graph_s), tg.data.Batch(**graph_t)
