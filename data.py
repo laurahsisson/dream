@@ -97,6 +97,13 @@ class PairData(tg.data.Data):
         else:
             return tg.data.Data(**graph_s), tg.data.Data(**graph_t)
 
+    @classmethod
+    def loader(cls, dataset, batch_size, shuffle=True):
+        return tg.loader.DataLoader(dataset,
+                     batch_size=batch_size,
+                     follow_batch=['x_s','x_t'],
+                     shuffle=shuffle)
+
 
 # TODO: Refactor into BlendData
 def combine_graphs(graphs):
