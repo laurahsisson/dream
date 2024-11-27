@@ -5,7 +5,8 @@ import numpy as np
 
 INDEX_KEYS = {"edge_index", "mol_batch", "blend_batch"}
 
-
+# For use in the backbone GNN model, holds an arbitrary number of
+# molecules.
 class BlendData(tg.data.Data):
     def __inc__(self, key, value, *args, **kwargs):
         # Used for indexing the molecule into each batch
@@ -14,6 +15,85 @@ class BlendData(tg.data.Data):
             return 1
         return super().__inc__(key, value, *args, **kwargs)
 
+# Specifically for loading ordered pairs of molecules, primarily
+# for use in similarity prediction.
+class PairData(tg.data.Data):
+    def __init__(self, data_s, data_t, y=None):
+        """
+        Initialize a BlendData object from two source graphs and optionally a label.
+
+        Args:
+            data_s (torch_geometric.data.Data): Source graph with arbitrary attributes.
+            data_t (torch_geometric.data.Data): Target graph with arbitrary attributes.
+            y (optional, torch.Tensor): Label or target value for the pair.
+        """
+        super().__init__()
+        
+        # Set attributes for source graph with `_s` suffix
+        for key, value in data_s.items():
+            setattr(self, f"{key}_s", value)
+        
+        # Set attributes for target graph with `_t` suffix
+        for key, value in data_t.items():
+            setattr(self, f"{key}_t", value)
+        
+        # Optionally set the label
+        self.y = y
+
+    def __inc__(self, key, value, *args, **kwargs):
+        # Adjust increments for edge indices to handle source and target separately
+        if key == 'edge_index_s':
+            return self.x_s.size(0)
+        if key == 'edge_index_t':
+            return self.x_t.size(0)
+        return super().__inc__(key, value, *args, **kwargs)
+
+    def __cat_dim__(self, key, value, *args, **kwargs):
+        # Ensure that x_s and x_t follow the correct batching
+        if key in ['x_s', 'x_t']:
+            return 0  # Concatenate along the node feature dimension
+        if key == 'y':
+            return None  # Avoid concatenation for y
+        return super().__cat_dim__(key, value, *args, **kwargs)
+
+    def get_graph(self, key):
+        """
+        Retrieve a source or target graph as a Data object.
+
+        Args:
+            key (str): The graph key, either 's' (source) or 't' (target).
+
+        Returns:
+            torch_geometric.data.Data: The extracted graph.
+
+        Raises:
+            ValueError: If the key is not 's' or 't'.
+        """
+        if key not in ['s', 't']:
+            raise ValueError(f"Invalid key '{key}'. Expected 's' or 't'.")
+
+        suffix = f"_{key}"
+        graph_data = {}
+        for attr, value in self.items():
+            if attr.endswith(suffix):
+                graph_data[attr[:-2]] = value  # Remove the suffix (_s or _t)
+
+        return Data(**graph_data)
+
+    @classmethod
+    def _make_batches(cls, pair_graph):
+        raise NotImplementedError("Use get_graph(key)") 
+
+    @classmethod
+    def _make_data(cls, pair_graph):
+        raise NotImplementedError("Use get_graph(key)") 
+
+    @classmethod
+    def split(cls, pair_graph):
+        raise NotImplementedError("Use get_graph(key)") 
+
+
+# TODO: Refactor into BlendData
 def combine_graphs(graphs):
     # Start with empty tensors for concatenation
     x_list, edge_index_list, edge_attr_list = [], [], []
@@ -51,49 +131,3 @@ def read_graph(graph_group: h5py._hl.group.Group):
     }
     return BlendData(**graph_data)
 
-
-class PairData(tg.data.Data):
-
-    def __inc__(self, key, value, *args, **kwargs):
-        if key == 'edge_index_s':
-            return self.x_s.size(0)
-        if key == 'edge_index_t':
-            return self.x_t.size(0)
-        return super().__inc__(key, value, *args, **kwargs)
-
-    @classmethod
-    def _make_batches(cls, pair_graph):
-        graph1 = tg.data.Batch(x=pair_graph.x_s,
-                               edge_index=pair_graph.edge_index_s,
-                               edge_attr=pair_graph.edge_attr_s,
-                               batch=pair_graph.x_s_batch,
-                               ptr=pair_graph.x_s_ptr)
-
-        graph2 = tg.data.Batch(x=pair_graph.x_t,
-                               edge_index=pair_graph.edge_index_t,
-                               edge_attr=pair_graph.edge_attr_t,
-                               batch=pair_graph.x_t_batch,
-                               ptr=pair_graph.x_t_ptr)
-        return graph1, graph2
-
-    @classmethod
-    def _make_data(cls, pair_graph):
-        graph1 = tg.data.Data(
-            x=pair_graph.x_s,
-            edge_index=pair_graph.edge_index_s,
-            edge_attr=pair_graph.edge_attr_s,
-        )
-
-        graph2 = tg.data.Data(
-            x=pair_graph.x_t,
-            edge_index=pair_graph.edge_index_t,
-            edge_attr=pair_graph.edge_attr_t,
-        )
-        return graph1, graph2
-
-    @classmethod
-    def split(cls, pair_graph):
-        if isinstance(pair_graph, tg.data.Batch):
-            return cls._make_batch(pair_graph)
-        else:
-            return cls._make_data(pair_graph)
