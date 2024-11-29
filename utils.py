@@ -1,6 +1,11 @@
 import torch
 
 
+def cosine_distance(emb1,emb2):
+    sim = torch.nn.functional.cosine_similarity(emb1,emb2,dim=-1)
+    return (1-sim)/2
+
+
 def count_parameters(module: torch.nn.Module):
     return sum(p.numel() for p in module.parameters())
 
