@@ -15,6 +15,9 @@ def to_torch(graph):
                 edge_attr=graph["edge_feat"].float(),
                 edge_index=graph["edge_index"])
 
+def smiles2torch(smiles):
+    return to_torch(smiles2graph(smiles))
+
 
 def convert(datapoint):
     return {
@@ -65,7 +68,7 @@ def make(pair_dataset,
     graph_data = dict()
     for smiles in all_smiles:
         try:
-            graph_data[smiles] = to_torch(smiles2graph(smiles))
+            graph_data[smiles] = smiles2torch(smiles)
         except AttributeError as e:
             print(e)
             errored += 1
