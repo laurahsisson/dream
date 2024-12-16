@@ -6,7 +6,7 @@ import torch
 # Get the directory where this script is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def _load_model(model_path, device='cuda'):
+def _load_model(model_path, device):
     # Build an absolute path from the script location
     production_path = os.path.join(BASE_DIR, "Production", model_path)
 
@@ -19,8 +19,8 @@ def _load_model(model_path, device='cuda'):
     graph_model.eval()
     return graph_model, config
 
-def load_pretrained():
-    return _load_model("pretrained")
+def load_pretrained(device='cuda'):
+    return _load_model("pretrained",device)
 
-def load_similarity():
-    return _load_model("similarity")
+def load_similarity(device='cuda'):
+    return _load_model("similarity",device)
