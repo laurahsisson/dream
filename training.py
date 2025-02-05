@@ -155,10 +155,10 @@ def train_model(graph_model, config, train_dataset, test_dataset, trial=None):
                 print(epoch, test_metrics)
                 print(
                     "NOTES:",
-                    len([
+                    [
                         k for k, v in test_metrics["auroc_per_note"].items()
                         if v > .5
-                    ]))
+                    ])
 
     if not trial is None:
         storage.save(config["trial_path"])
