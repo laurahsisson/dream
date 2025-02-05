@@ -163,8 +163,8 @@ def train_model(graph_model, config, train_dataset, test_dataset, trial=None):
     if not trial is None:
         storage.save(config["trial_path"])
 
-    print({k: for k, v in test_metrics["auroc_per_note"].items()
+    print({k:v for k, v in test_metrics["auroc_per_note"].items()
         if v > .5
     })
-    
+
     return graph_model, max(test_aurocs)
