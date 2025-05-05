@@ -164,5 +164,8 @@ cython_debug/
 Data/
 Docker/
 
+# Too large
+**/mixture_definition_in-silico_100000.csv
+
 # Not ready to be public yet
 Preprint/
