@@ -1,24 +1,21 @@
 import json
-import os
-
 import torch
-
 from odorpair import gcn
+import importlib.resources as pkg_resources
+from pathlib import Path
 
-# Get the directory where this script is located
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+def _load_model(model_dir: str, device: str):
+    # Access the files inside odorpair.Production.model_dir
+    base_path = pkg_resources.files("odorpair.Production").joinpath(model_dir)
+    config_path = base_path / "config.json"
+    model_path = base_path / "model.pt"
 
-
-def _load_model(model_path, device):
-    # Build an absolute path from the script location
-    production_path = os.path.join(BASE_DIR, "Production", model_path)
-
-    with open(os.path.join(production_path, "config.json")) as f:
+    with config_path.open("r") as f:
         config = json.load(f)
 
     graph_model = gcn.GCN(**config)
     model_weights = torch.load(
-        os.path.join(production_path, "model.pt"),
+        model_path,
         weights_only=True,
         map_location=device,
     )
@@ -26,10 +23,8 @@ def _load_model(model_path, device):
     graph_model.eval()
     return graph_model, config
 
-
 def load_pretrained(device="cuda"):
     return _load_model("pretrained", device)
-
 
 def load_similarity(device="cuda"):
     return _load_model("similarity", device)
