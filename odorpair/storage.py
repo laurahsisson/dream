@@ -13,7 +13,8 @@ def make_serializable(data):
         return float(data)
     if isinstance(data, dict):
         return {
-            k: make_serializable(v) for k, v in data.items()
+            k: make_serializable(v)
+            for k, v in data.items()
         }  # Recurse for dictionaries
     if isinstance(data, list):
         return [make_serializable(v) for v in data]  # Recurse for lists

@@ -6,21 +6,9 @@ from odorpair import activation, aggregate, utils
 
 class GCN(torch.nn.Module):
 
-    def __init__(
-        self,
-        in_features,
-        num_convs,
-        num_mpnns,
-        num_hidden_layers,
-        hidden_dim,
-        dropout,
-        do_two_stage,
-        num_heads,
-        num_sabs,
-        notes_dim,
-        act_mode,
-        **kwargs
-    ):
+    def __init__(self, in_features, num_convs, num_mpnns, num_hidden_layers,
+                 hidden_dim, dropout, do_two_stage, num_heads, num_sabs,
+                 notes_dim, act_mode, **kwargs):
         """
         Initializes the GCN model.
 
@@ -115,7 +103,8 @@ class GCN(torch.nn.Module):
 
         # Save the embedding
         x = self.readout(x, graph)
-        embedding = x.clone()  # Clone to ensure isolation from further modifications
+        embedding = x.clone(
+        )  # Clone to ensure isolation from further modifications
 
         # Predict notes using the final embedding
         predictions = self.notes_predictor(x)

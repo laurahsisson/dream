@@ -9,6 +9,7 @@ INDEX_KEYS = {"edge_index", "mol_batch", "blend_batch"}
 # For use in the backbone GNN model, holds an arbitrary number of
 # molecules.
 class BlendData(tg.data.Data):
+
     def __inc__(self, key, value, *args, **kwargs):
         # Used for indexing the molecule into each batch
         # Each blend has only 1 blend (by definition)
@@ -20,6 +21,7 @@ class BlendData(tg.data.Data):
 # Specifically for loading ordered pairs of molecules, primarily
 # for use in similarity prediction.
 class PairData(tg.data.Data):
+
     def __inc__(self, key, value, *args, **kwargs):
         # Adjust increments for edge indices to handle source and target separately
         if key == "edge_index_s":
@@ -101,9 +103,10 @@ class PairData(tg.data.Data):
 
     @classmethod
     def loader(cls, dataset, batch_size, shuffle=True):
-        return tg.loader.DataLoader(
-            dataset, batch_size=batch_size, follow_batch=["x_s", "x_t"], shuffle=shuffle
-        )
+        return tg.loader.DataLoader(dataset,
+                                    batch_size=batch_size,
+                                    follow_batch=["x_s", "x_t"],
+                                    shuffle=shuffle)
 
 
 # TODO: Refactor into BlendData
@@ -119,7 +122,8 @@ def combine_graphs(graphs):
         edge_index_list.append(graph.edge_index + current_node_index)
 
         # `mol_batch` needs to mark the molecule index for each node
-        mol_batch_list.append(torch.full((graph.x.size(0),), i, dtype=torch.long))
+        mol_batch_list.append(
+            torch.full((graph.x.size(0), ), i, dtype=torch.long))
 
         # Update node index offset for the next graph
         current_node_index += graph.x.size(0)
@@ -145,6 +149,7 @@ def combine_graphs(graphs):
 def read_graph(graph_group: h5py._hl.group.Group):
     graph_data = {k: torch.tensor(np.array(v)) for k, v in graph_group.items()}
     graph_data = {
-        k: v.long() if k in INDEX_KEYS else v.float() for k, v in graph_data.items()
+        k: v.long() if k in INDEX_KEYS else v.float()
+        for k, v in graph_data.items()
     }
     return BlendData(**graph_data)

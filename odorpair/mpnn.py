@@ -8,8 +8,8 @@ from odorpair import activation
 # Config does not contain dropout/do_edge_update/node_in_feats/edge_in_feats/aggr_mode
 # because these are fixed at the encoder level (not at MPNN level)
 Config = collections.namedtuple(
-    "Config", ["node_out_feats", "edge_hidden_feats", "num_step_message_passing"]
-)
+    "Config",
+    ["node_out_feats", "edge_hidden_feats", "num_step_message_passing"])
 
 
 class MPNNGNN(torch.nn.Module):
@@ -72,9 +72,8 @@ class MPNNGNN(torch.nn.Module):
             )
 
             self.edge_update_network = torch.nn.Sequential(
-                torch.nn.Linear(
-                    edge_hidden_feats + 2 * node_out_feats, edge_hidden_feats
-                ),
+                torch.nn.Linear(edge_hidden_feats + 2 * node_out_feats,
+                                edge_hidden_feats),
                 act_fn(),
                 torch.nn.Linear(edge_hidden_feats, edge_hidden_feats),
                 act_fn(),
@@ -82,7 +81,8 @@ class MPNNGNN(torch.nn.Module):
             )
 
             edge_network = torch.nn.Sequential(
-                torch.nn.Linear(edge_hidden_feats, node_out_feats * node_out_feats),
+                torch.nn.Linear(edge_hidden_feats,
+                                node_out_feats * node_out_feats),
                 act_fn(),
                 torch.nn.Dropout(dropout),
             )
@@ -91,7 +91,8 @@ class MPNNGNN(torch.nn.Module):
             edge_network = torch.nn.Sequential(
                 torch.nn.Linear(edge_in_feats, edge_hidden_feats),
                 act_fn(),
-                torch.nn.Linear(edge_hidden_feats, node_out_feats * node_out_feats),
+                torch.nn.Linear(edge_hidden_feats,
+                                node_out_feats * node_out_feats),
                 act_fn(),
                 torch.nn.Dropout(dropout),
             )
@@ -106,7 +107,9 @@ class MPNNGNN(torch.nn.Module):
 
         self.node_out_feats = node_out_feats
 
-        self.gru = torch.nn.GRU(node_out_feats, node_out_feats, bidirectional=False)
+        self.gru = torch.nn.GRU(node_out_feats,
+                                node_out_feats,
+                                bidirectional=False)
         self.final_dropout = torch.nn.Dropout(dropout)
         self.act_fn = act_fn()
 
@@ -135,35 +138,32 @@ class MPNNGNN(torch.nn.Module):
         hidden_feats = node_feats.unsqueeze(0)  # (1, V, node_out_feats)
 
         if self.do_edge_update:
-            edge_attr = self.project_edge_feats(edge_attr)  # (V, edge_hidden_feats)
+            edge_attr = self.project_edge_feats(
+                edge_attr)  # (V, edge_hidden_feats)
 
         for _ in range(self.num_step_message_passing):
             node_feats = self.act_fn(
-                self.gnn_layer(node_feats, graph.edge_index, edge_attr)
-            )
-            node_feats, hidden_feats = self.gru(node_feats.unsqueeze(0), hidden_feats)
+                self.gnn_layer(node_feats, graph.edge_index, edge_attr))
+            node_feats, hidden_feats = self.gru(node_feats.unsqueeze(0),
+                                                hidden_feats)
             node_feats = self.final_dropout(node_feats.squeeze(0))
 
             if self.do_edge_update:
                 # Update edge attributes using node features of both ends of the edges
                 row, col = graph.edge_index
                 edge_input = torch.cat(
-                    [node_feats[row], node_feats[col], edge_attr], dim=1
-                )
+                    [node_feats[row], node_feats[col], edge_attr], dim=1)
                 edge_attr = self.edge_update_network(edge_input)
 
         return node_feats, edge_attr
 
 
-def from_config(
-    config, node_in_feats, edge_in_feats, dropout, do_edge_update, act_mode, aggr_mode
-):
-    return MPNNGNN(
-        **config._asdict(),
-        node_in_feats=node_in_feats,
-        edge_in_feats=edge_in_feats,
-        dropout=dropout,
-        do_edge_update=do_edge_update,
-        act_mode=act_mode,
-        aggr_mode=aggr_mode
-    )
+def from_config(config, node_in_feats, edge_in_feats, dropout, do_edge_update,
+                act_mode, aggr_mode):
+    return MPNNGNN(**config._asdict(),
+                   node_in_feats=node_in_feats,
+                   edge_in_feats=edge_in_feats,
+                   dropout=dropout,
+                   do_edge_update=do_edge_update,
+                   act_mode=act_mode,
+                   aggr_mode=aggr_mode)

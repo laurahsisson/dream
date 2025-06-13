@@ -6,21 +6,9 @@ from odorpair import aggregate, embedding, mpnn, utils
 
 class Encoder(torch.nn.Module):
 
-    def __init__(
-        self,
-        graph_tokenizer,
-        mpnn_configs,
-        embedding_dim_x,
-        embedding_dim_edge_attr,
-        do_edge_update,
-        do_two_stage,
-        num_sabs,
-        heads,
-        dropout,
-        act_mode,
-        aggr_mode,
-        **kwargs
-    ):
+    def __init__(self, graph_tokenizer, mpnn_configs, embedding_dim_x,
+                 embedding_dim_edge_attr, do_edge_update, do_two_stage,
+                 num_sabs, heads, dropout, act_mode, aggr_mode, **kwargs):
         super(Encoder, self).__init__()
 
         use_embed = not graph_tokenizer is None

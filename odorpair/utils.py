@@ -17,11 +17,15 @@ def make_scheduler(optimizer, warmup, total_steps):
     cooldown_steps = total_steps - warmup_steps
     # Define the warmup and cooldown schedulers
     warmup_scheduler = torch.optim.lr_scheduler.LinearLR(
-        optimizer, start_factor=1e-10, end_factor=1.0, total_iters=warmup_steps
-    )
+        optimizer,
+        start_factor=1e-10,
+        end_factor=1.0,
+        total_iters=warmup_steps)
     cooldown_scheduler = torch.optim.lr_scheduler.LinearLR(
-        optimizer, start_factor=1.0, end_factor=1e-10, total_iters=cooldown_steps
-    )
+        optimizer,
+        start_factor=1.0,
+        end_factor=1e-10,
+        total_iters=cooldown_steps)
     # Chain the schedulers together with SequentialLR
     return torch.optim.lr_scheduler.SequentialLR(
         optimizer,

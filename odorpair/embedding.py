@@ -21,17 +21,15 @@ class Embedding(torch.nn.Module):
 
         if self.use_embed:
             self.embed_x = torch.nn.Embedding(unique_x, embedding_dim_x)
-            self.embed_edge_attr = torch.nn.Embedding(
-                unique_edge_attr, embedding_dim_edge_attr
-            )
+            self.embed_edge_attr = torch.nn.Embedding(unique_edge_attr,
+                                                      embedding_dim_edge_attr)
         else:
             # unique_x should be the hidden size here
             self.embed_x = torch.nn.Sequential(
-                torch.nn.Linear(unique_x, embedding_dim_x), act_fn()
-            )
+                torch.nn.Linear(unique_x, embedding_dim_x), act_fn())
             self.embed_edge_attr = torch.nn.Sequential(
-                torch.nn.Linear(unique_edge_attr, embedding_dim_edge_attr), act_fn()
-            )
+                torch.nn.Linear(unique_edge_attr, embedding_dim_edge_attr),
+                act_fn())
 
     def forward(self, graph: tg.data.Data):
         return self.embed_x(graph.x), self.embed_edge_attr(graph.edge_attr)
