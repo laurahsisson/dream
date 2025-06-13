@@ -1,5 +1,6 @@
-import olfactor
-import activation
+from odorpair import olfactor
+from odorpair import activation
+
 import torch
 import utils
 

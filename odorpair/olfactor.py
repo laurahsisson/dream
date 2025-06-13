@@ -1,5 +1,6 @@
+from odorpair import activation
+
 import encoder
-import activation
 import torch
 
 

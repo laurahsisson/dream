@@ -1,9 +1,10 @@
+from odorpair import utils
+from odorpair import activation
+from odorpair import aggregate
+
+
 import torch
 import torch_geometric as pyg
-import utils
-import activation
-import aggregate
-
 
 class GCN(torch.nn.Module):
 

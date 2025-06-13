@@ -1,7 +1,8 @@
+from odorpair import activation
+
 import torch
 import torch_geometric as tg
 import collections
-import activation
 
 # Config does not contain dropout/do_edge_update/node_in_feats/edge_in_feats/aggr_mode
 # because these are fixed at the encoder level (not at MPNN level)

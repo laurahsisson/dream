@@ -1,5 +1,6 @@
+from odorpair import gcn
+
 import json
-import gcn
 import os
 import torch
 

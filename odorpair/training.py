@@ -1,14 +1,15 @@
+from odorpair import gcn
+from odorpair import utils
+from odorpair import storage
+
 import optuna
 import gc
 import time
 from tqdm.notebook import tqdm
 import torchmetrics
 import numpy as np
-import gcn
-import utils
 import torch_geometric as pyg
 import torch
-import storage
 
 
 def predict(graph_model, batch):

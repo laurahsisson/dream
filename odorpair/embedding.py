@@ -1,7 +1,7 @@
+from odorpair import activation
+
 import torch
 import torch_geometric as tg
-import activation
-
 
 class Embedding(torch.nn.Module):
 
