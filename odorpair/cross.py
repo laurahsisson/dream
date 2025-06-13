@@ -1,8 +1,7 @@
-from odorpair import olfactor
-from odorpair import activation
-
 import torch
 import utils
+
+from odorpair import activation, olfactor
 
 
 class CrossEncoder(torch.nn.Module):

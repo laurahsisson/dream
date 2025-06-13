@@ -1,8 +1,9 @@
-from odorpair import gcn
-
 import json
 import os
+
 import torch
+
+from odorpair import gcn
 
 # Get the directory where this script is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

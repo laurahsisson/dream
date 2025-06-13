@@ -1,7 +1,7 @@
-from odorpair import activation
-
 import encoder
 import torch
+
+from odorpair import activation
 
 
 class Olfactor(torch.nn.Module):

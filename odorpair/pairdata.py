@@ -1,11 +1,11 @@
-from odorpair import data
-
-from tqdm.notebook import tqdm
+import numpy as np
 import torch
 from ogb.utils import smiles2graph
-from torch_geometric.data import InMemoryDataset, download_url, Data
+from torch_geometric.data import Data, InMemoryDataset, download_url
 from torch_geometric.loader import DataLoader
-import numpy as np
+from tqdm.notebook import tqdm
+
+from odorpair import data
 
 
 def to_torch(graph):

@@ -1,5 +1,5 @@
-import h5py
 import data
+import h5py
 import torch
 import tqdm
 

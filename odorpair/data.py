@@ -1,7 +1,7 @@
-import torch_geometric as tg
-import torch
 import h5py
 import numpy as np
+import torch
+import torch_geometric as tg
 
 INDEX_KEYS = {"edge_index", "mol_batch", "blend_batch"}
 

@@ -1,10 +1,7 @@
-from odorpair import mpnn
-from odorpair import embedding
-from odorpair import utils
-from odorpair import aggregate
-
 import torch
 import torch_geometric as tg
+
+from odorpair import aggregate, embedding, mpnn, utils
 
 
 class Encoder(torch.nn.Module):

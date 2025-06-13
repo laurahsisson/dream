@@ -1,8 +1,9 @@
-import os
-import torch
-import numpy
 import json
+import os
+
+import numpy
 import numpy as np
+import torch
 
 
 def make_serializable(data):
