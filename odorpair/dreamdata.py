@@ -16,11 +16,11 @@ def read_tensor(group, key):
 
 def load_dream_h5(fname):
     dream_data = []
-    with h5py.File(fname, 'r') as f:
+    with h5py.File(fname, "r") as f:
         for idx in tqdm.tqdm(f.keys()):
             group = f[idx]
-            graph1 = data.read_graph(group['graph1'])
-            graph2 = data.read_graph(group['graph2'])
+            graph1 = data.read_graph(group["graph1"])
+            graph2 = data.read_graph(group["graph2"])
             dataset = read_string(group, "dataset")
             label = read_string(group, "label")
             mixture1 = read_string(group, "mixture1")
@@ -33,11 +33,11 @@ def load_dream_h5(fname):
                 "graph1": graph1,
                 "graph2": graph2,
                 "dataset": dataset,
-                "overlap": read_tensor(group, "overlap")
+                "overlap": read_tensor(group, "overlap"),
             }
             if "y" in group:
                 entry["y"] = read_tensor(group, "y")
             dream_data.append(entry)
 
-    dream_data = sorted(dream_data, key=lambda d: d['idx'])
+    dream_data = sorted(dream_data, key=lambda d: d["idx"])
     return dream_data

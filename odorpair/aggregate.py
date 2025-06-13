@@ -11,14 +11,16 @@ class TwoStageAggregator(torch.nn.Module):
             heads=heads,
             num_encoder_blocks=num_sabs,
             num_decoder_blocks=num_sabs,
-            dropout=dropout)
+            dropout=dropout,
+        )
 
         self.blend_readout = tg.nn.aggr.set_transformer.SetTransformerAggregation(
             in_channels,
             heads=heads,
             num_encoder_blocks=num_sabs,
             num_decoder_blocks=num_sabs,
-            dropout=dropout)
+            dropout=dropout,
+        )
 
     def forward(self, x, graph):
         # Aggregation over atoms in a molecule
@@ -34,15 +36,15 @@ class BlendAggregator(torch.nn.Module):
         self.do_two_stage = do_two_stage
         self.in_channels = in_channels
         if do_two_stage:
-            self.readout = TwoStageAggregator(in_channels, heads, num_sabs,
-                                              dropout)
+            self.readout = TwoStageAggregator(in_channels, heads, num_sabs, dropout)
         else:
             self.readout = tg.nn.aggr.set_transformer.SetTransformerAggregation(
                 in_channels,
                 heads=heads,
                 num_encoder_blocks=num_sabs,
                 num_decoder_blocks=num_sabs,
-                dropout=dropout)
+                dropout=dropout,
+            )
 
     def forward(self, x, graph):
         if self.do_two_stage:

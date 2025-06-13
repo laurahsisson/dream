@@ -8,8 +8,7 @@ class VectorTokenizer:
         self.unique_vector_tuples = unique_vector_tuples
         # Create a dictionary to map each vector to its index
         self.vector_to_index = {
-            vector: idx
-            for idx, vector in enumerate(self.unique_vector_tuples)
+            vector: idx for idx, vector in enumerate(self.unique_vector_tuples)
         }
 
     def tokenize(self, vector):
@@ -35,7 +34,8 @@ class GraphTokenizer:
         tokenized = graph.clone()
         tokenized.x = self.x_tokenizer.tokenize_batch(tokenized.x)
         tokenized.edge_attr = self.edge_attr_tokenizer.tokenize_batch(
-            tokenized.edge_attr)
+            tokenized.edge_attr
+        )
         return tokenized
 
     def unique_x(self):

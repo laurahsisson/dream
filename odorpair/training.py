@@ -26,8 +26,7 @@ def do_train_step(optimizer, scheduler, graph_model, batch):
     optimizer.zero_grad()
 
     logits, targets = predict(graph_model, batch)
-    loss = torch.nn.functional.binary_cross_entropy_with_logits(
-        logits, targets)
+    loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, targets)
 
     loss.backward()
 
@@ -41,16 +40,17 @@ def calc_test_metrics(graph_model, config, test_loader):
     tls = []
     # For per-note AUROC
     auroc_metric_per_note = torchmetrics.classification.MultilabelAUROC(
-        config["notes_dim"], average=None)
+        config["notes_dim"], average=None
+    )
     # For micro-average AUROC
     auroc_metric_micro = torchmetrics.classification.MultilabelAUROC(
-        config["notes_dim"], average='micro')
+        config["notes_dim"], average="micro"
+    )
 
     with torch.no_grad():
         for batch in test_loader:
             logits, targets = predict(graph_model, batch)
-            loss = torch.nn.functional.binary_cross_entropy_with_logits(
-                logits, targets)
+            loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, targets)
 
             auroc_metric_per_note.update(logits, targets.int())
             auroc_metric_micro.update(logits, targets.int())
@@ -63,7 +63,7 @@ def calc_test_metrics(graph_model, config, test_loader):
     return {
         "auroc": auroc_micro,  # Micro-average AUROC
         "loss": np.mean(tls),
-        "auroc_per_note": dict(zip(config["covered_notes"], auroc_per_note))
+        "auroc_per_note": dict(zip(config["covered_notes"], auroc_per_note)),
     }
 
 
@@ -78,7 +78,7 @@ def train_model(graph_model, config, train_dataset, test_dataset, trial=None):
             "test_loss": test_losses,
             "test_aurocs": test_aurocs,
             "time": elapsed,
-            "auroc": auroc
+            "auroc": auroc,
         }
         data["count_parameters"] = model_size
         return utils.make_serializable(data)
@@ -87,32 +87,36 @@ def train_model(graph_model, config, train_dataset, test_dataset, trial=None):
 
     model_size = utils.count_parameters(graph_model)
 
-    print(f"Trial ID = {config['trial_id']}",
-          f"Model Size = {model_size:,}",
-          config,
-          sep="\n")
-    if not trial is None and (model_size <= config["max_size"]
-                              or model_size >= config["min_size"]):
+    print(
+        f"Trial ID = {config['trial_id']}",
+        f"Model Size = {model_size:,}",
+        config,
+        sep="\n",
+    )
+    if not trial is None and (
+        model_size <= config["max_size"] or model_size >= config["min_size"]
+    ):
         print(f"Invalid Size {model_size:,}")
         raise optuna.TrialPruned()
 
     graph_model.cuda()
 
-    train_loader = pyg.loader.DataLoader(train_dataset,
-                                         batch_size=config["bsz"],
-                                         shuffle=True)
-    test_loader = pyg.loader.DataLoader(test_dataset,
-                                        batch_size=config["bsz"],
-                                        shuffle=True)
+    train_loader = pyg.loader.DataLoader(
+        train_dataset, batch_size=config["bsz"], shuffle=True
+    )
+    test_loader = pyg.loader.DataLoader(
+        test_dataset, batch_size=config["bsz"], shuffle=True
+    )
 
-    optimizer = torch.optim.AdamW(graph_model.parameters(),
-                                  lr=config["lr"],
-                                  weight_decay=config["weight_decay"],
-                                  betas=config["betas"])
+    optimizer = torch.optim.AdamW(
+        graph_model.parameters(),
+        lr=config["lr"],
+        weight_decay=config["weight_decay"],
+        betas=config["betas"],
+    )
 
     total_steps = config["epochs"] * len(train_loader)
-    scheduler = utils.make_scheduler(optimizer, config["warmup"],
-                                           total_steps)
+    scheduler = utils.make_scheduler(optimizer, config["warmup"], total_steps)
 
     step = 0
     test_losses = []
@@ -147,25 +151,25 @@ def train_model(graph_model, config, train_dataset, test_dataset, trial=None):
                 # Early stopping
                 trial.report(test_metrics["auroc"], epoch)
                 if trial.should_prune():
-                    print(
-                        f"Pruning after {epoch} epochs w/ score {best_auroc:.2f}"
-                    )
+                    print(f"Pruning after {epoch} epochs w/ score {best_auroc:.2f}")
                     storage.save(config["trial_path"])
                     raise optuna.TrialPruned()
             else:
                 print(epoch, test_metrics)
                 print(
                     "NOTES:",
-                    len([
-                        k for k, v in test_metrics["auroc_per_note"].items()
-                        if v > .5
-                    ]))
+                    len(
+                        [
+                            k
+                            for k, v in test_metrics["auroc_per_note"].items()
+                            if v > 0.5
+                        ]
+                    ),
+                )
 
     if not trial is None:
         storage.save(config["trial_path"])
 
-    print({k:v for k, v in test_metrics["auroc_per_note"].items()
-        if v > .5
-    })
+    print({k: v for k, v in test_metrics["auroc_per_note"].items() if v > 0.5})
 
     return graph_model, max(test_aurocs)

@@ -9,12 +9,15 @@ import numpy as np
 
 
 def to_torch(graph):
-    tensor_keys = ["edge_index", 'edge_feat', 'node_feat']
+    tensor_keys = ["edge_index", "edge_feat", "node_feat"]
     for key in tensor_keys:
         graph[key] = torch.from_numpy(graph[key])
-    return Data(x=graph["node_feat"].float(),
-                edge_attr=graph["edge_feat"].float(),
-                edge_index=graph["edge_index"])
+    return Data(
+        x=graph["node_feat"].float(),
+        edge_attr=graph["edge_feat"].float(),
+        edge_index=graph["edge_index"],
+    )
+
 
 def smiles2torch(smiles):
     return to_torch(smiles2graph(smiles))
@@ -24,14 +27,13 @@ def convert(datapoint):
     return {
         "mol1": datapoint["edge"][0],
         "mol2": datapoint["edge"][1],
-        "blend_notes": datapoint["blend_notes"]
+        "blend_notes": datapoint["blend_notes"],
     }
 
-def make(pair_dataset,
-         all_notes=None,
-         convert_first=False,
-         disable_tqdm=False,
-         limit=None):
+
+def make(
+    pair_dataset, all_notes=None, convert_first=False, disable_tqdm=False, limit=None
+):
     if convert_first:
         pair_dataset = [convert(d) for d in pair_dataset]
 
@@ -75,8 +77,7 @@ def make(pair_dataset,
             errored += 1
 
     pair_to_data = dict()
-    for i, d in enumerate(
-            tqdm(pair_dataset, smoothing=0, disable=disable_tqdm)):
+    for i, d in enumerate(tqdm(pair_dataset, smoothing=0, disable=disable_tqdm)):
         if not d["mol1"] in graph_data or not d["mol2"] in graph_data:
             continue
         pair = (d["mol1"], d["mol2"])
@@ -84,15 +85,10 @@ def make(pair_dataset,
         g2 = graph_data[d["mol2"]]
         pair_to_data[pair] = data.combine_graphs([g1, g2])
 
-    valid_pairs = set(pair_to_data.keys()).intersection(
-        set(all_multihots.keys()))
+    valid_pairs = set(pair_to_data.keys()).intersection(set(all_multihots.keys()))
 
     dataset = []
-    for (pair, graph) in pair_to_data.items():
-        dataset.append({
-            "pair": pair,
-            "graph": graph,
-            "notes": all_multihots[pair]
-        })
+    for pair, graph in pair_to_data.items():
+        dataset.append({"pair": pair, "graph": graph, "notes": all_multihots[pair]})
 
     return dataset

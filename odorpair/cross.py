@@ -7,9 +7,17 @@ import utils
 
 class CrossEncoder(torch.nn.Module):
 
-    def __init__(self, olfactor: olfactor.Olfactor, representation_mode: str,
-                 cross_encoder_dim: int, act_mode: str, do_encoder_diff: bool,
-                 do_sigmoid: bool, cross_encoder_layers: int, **kwargs):
+    def __init__(
+        self,
+        olfactor: olfactor.Olfactor,
+        representation_mode: str,
+        cross_encoder_dim: int,
+        act_mode: str,
+        do_encoder_diff: bool,
+        do_sigmoid: bool,
+        cross_encoder_layers: int,
+        **kwargs
+    ):
         super(CrossEncoder, self).__init__()
         self.olfactor = olfactor
         self.representation_mode = representation_mode
@@ -34,11 +42,14 @@ class CrossEncoder(torch.nn.Module):
             hidden_dim=cross_encoder_dim,
             out_dim=1,
             act_fn=act_fn,
-            num_hidden_layers=cross_encoder_layers)
+            num_hidden_layers=cross_encoder_layers,
+        )
         if cross_encoder_dim > 0:
             self.readout = torch.nn.Sequential(
-                torch.nn.Linear(combined_dim, cross_encoder_dim), act_fn(),
-                torch.nn.Linear(cross_encoder_dim, 1))
+                torch.nn.Linear(combined_dim, cross_encoder_dim),
+                act_fn(),
+                torch.nn.Linear(cross_encoder_dim, 1),
+            )
         else:
             self.readout = torch.nn.Linear(combined_dim, 1)
 
