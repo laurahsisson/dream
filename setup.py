@@ -1,3 +1,5 @@
+from setuptools import find_packages, setup
+
 setup(
     name="odor-pair",
     version="1.0",
